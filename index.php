@@ -23,16 +23,42 @@
 <html>
 <header><title>This is title</title></header>
 <body>
-Hello world
+DotaDrafter version 0.1
 </body>
 
 
 <? 
 
+	//search_Words
+	$match_id = "";
+	$homepage = "";
+	$radiant_win = "";
+	$match_ids = [];
+
+
+
+	function add_string_to_array($array, $string){
+
+		array_push($array, $string);
+
+		return $array;
+	}
+
+
+	function look_for_string($word, $text)
+	{
+		if (strpos($text, $word) !== false) {
+		    echo $text[55] + $text[56] + $text[57];
+		} 
+		else {
+		    echo 'false';
+		} 	
+	}
+
 
 
 	#dictionary of top500 ranked players
-	$array = [
+	$array2 = [
     "paparazi" => 137193239,
     "california" => 181716137,
     "sufail" => 111620041,
@@ -60,14 +86,76 @@ Hello world
     "kaka" => 139876032
 	];
 
+	$array = [
+    "sufail" => 111620041,
+    "kaka" => 139876032
+	];
+
+
+
+	
 	foreach($array as $key=>$value) {
 	    $account_id =  $array[$key];
-	    
-	    
+
+	    $url_string = "https://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/V001/?format=json&key=6BBA3821AD660B398F38F86552FCE117&account_id=".$account_id;
+
+	    $homepage = $homepage.file_get_contents($url_string);
+ 
 	}
 
-	echo $array[0];
-	echo "<br>";
+
+	
+	while(strpos($homepage, "match_id", $offset)!==false){
+
+		$match_id_str = "";
+
+		$str_index = strpos($homepage, "match_id",$offset);
+
+		for ($x = 10; $x <= 16; $x++) {
+		    $match_id_str = $match_id_str.$homepage[$str_index+$x];
+		}
+		
+		$string = $homepage[$str_index];
+		array_push($match_ids, $match_id_str);
+		//+1 so the algorithm does not find the same string again
+		$offset = $str_index+1;
+
+		
+
+		
+
+	}	
+
+	for($i=0; $i<sizeof($match_ids); $i++){
+
+
+		echo $match_ids[$i]."<br>";
+	
+
+	}
+
+	
+	
+	for($i=0; $i<2; $i++){
+
+		$match_details = "";
+		$radiant_win = "";
+
+		$match_details_str = "https://api.steampowered.com/IDOTA2Match_570/GetMatchDetails/v1/?key=6BBA3821AD660B398F38F86552FCE117&match_id=".$match_ids[$i];
+
+		$match_details = file_get_contents($match_details_str);
+
+		echo $match_details."<br>";
+		echo "who wins? <br>";
+		echo $match_details[strpos($match_details, "radiant_win")+13]."<br>";
+
+
+
+	
+	}
+
+	
+
 
 
  	if(isset($_SESSION['steamid'])) {?>
@@ -89,108 +177,6 @@ Hello world
 
 <?
 
-
-
-	function add_string_to_array($array, $string){
-
-
-		array_push($array, $string);
-
-
-
-		return $array;
-		
-
-
-	}
-
-
-	function look_for_string($word, $text)
-	{
-
-		if (strpos($text, $word) !== false) {
-		    echo $text[55] + $text[56] + $text[57];
-		} else {
-		    echo 'false';
-		}
-		
-
-    	
-	}
-    
-	
-    	
-
-	$file = 'people.txt';
-	$homepage = file_get_contents("https://api.steampowered.com/IDOTA2Match_205790/GetMatchHistory/v1/?key=6BBA3821AD660B398F38F86552FCE117&matches_requested=100");
-	file_put_contents($file, $homepage);
-
-	#file_put_contents($file, $homepage);
-
-	look_for_string("match_id",$homepage);
-
-	$offset = 0;
-
-	$index1 = 0;
-	
-
-	for($pages = 0 ; $pages<3; $pages++){
-
-
-		for ($x = 0; $x <= 100; $x++){
-
-			
-
-			if(strpos($homepage, "match_id", $offset+10)==false){
-
-				
-				
-				break;
-			}
-
-			echo "hello mattse";
-
-			$match_id_str = "";
-			$index1  = strpos($homepage, "match_id", $offset+10);
-			$offset = $index1;
-
-			#10 to 16: this is the letters after the search-word "match_id"  (the actual number)
-			for ($x = 10; $x <= 16; $x++) {
-			    $match_id_str = $match_id_str.$homepage[$index1+$x];
-			}
-
-			echo "offset";
-			echo "<br>";
-			echo $offset;
-			echo "<br>";
-			echo "match_id_str";
-			echo "<br>";
-			echo $match_id_str;
-			echo "<br>";
-
-
-
-
-
-			
-		}
-		echo "<br>";
-		echo "______________________________";
-		echo "<br>";
-
-		$cmd_url  = "https://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/v1/?key=6BBA3821AD660B398F38F86552FCE117&start_at_match_id=3952121001";
-
-		
-		echo "cmd_url: ";
-		echo "<br>";
-		echo $cmd_url;
-
-
-		$homepage = file_get_contents($cmd_url);
-		echo $homepage;
-		echo "<br>";
-		file_put_contents($file, $homepage, FILE_APPEND);
-	}
 
 
 		
